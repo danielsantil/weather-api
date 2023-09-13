@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
+	gin.Default()
 	fmt.Println("working")
 }
