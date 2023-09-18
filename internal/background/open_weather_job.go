@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/danielsantil/weather-api/internal/models"
 	"github.com/danielsantil/weather-api/internal/models/database"
+	"github.com/danielsantil/weather-api/internal/models/open_weather"
 	"gorm.io/gorm"
 	"io"
 	"log"
@@ -60,8 +60,8 @@ func updateWeather(db *gorm.DB, cities []database.City, wg *sync.WaitGroup) {
 	}
 }
 
-func mapToDbWeather(w models.WeatherResponse) database.Weather {
-	mapConditions := func(conditionsArray []models.WeatherCondition) []database.Condition {
+func mapToDbWeather(w open_weather.WeatherResponse) database.Weather {
+	mapConditions := func(conditionsArray []open_weather.WeatherCondition) []database.Condition {
 		conditionsRes := make([]database.Condition, len(conditionsArray))
 		for i, cond := range conditionsArray {
 			conditionsRes[i] = database.Condition{
@@ -122,13 +122,13 @@ func getCitiesForWorkers(cities []database.City, workerCount int) [][]database.C
 	return listOfCities
 }
 
-func fetchWeatherData(city database.City) (models.WeatherResponse, error) {
+func fetchWeatherData(city database.City) (open_weather.WeatherResponse, error) {
 	log.Printf("Fetching weather data for city: %d - %s\n", city.CityId, city.Name)
 	httpClient := http.Client{}
 	baseUrl := "https://api.openweathermap.org/data/2.5"
 	res, hErr := httpClient.Get(fmt.Sprintf("%s/weather?id=%d&appid=%s", baseUrl, city.CityId, "e9d23eedd545de00620c0c542ffb66e1"))
 	if hErr != nil {
-		return models.WeatherResponse{},
+		return open_weather.WeatherResponse{},
 			errors.New(fmt.Sprintf("Http error. City %s: %v", city.Name, hErr))
 	}
 	defer func(Body io.ReadCloser) {
@@ -140,14 +140,14 @@ func fetchWeatherData(city database.City) (models.WeatherResponse, error) {
 
 	data, rErr := io.ReadAll(res.Body)
 	if rErr != nil {
-		return models.WeatherResponse{},
+		return open_weather.WeatherResponse{},
 			errors.New(fmt.Sprintf("Reader error. City %s: %v", city.Name, rErr))
 	}
 
-	var weather models.WeatherResponse
+	var weather open_weather.WeatherResponse
 	mErr := json.Unmarshal(data, &weather)
 	if mErr != nil {
-		return models.WeatherResponse{},
+		return open_weather.WeatherResponse{},
 			errors.New(fmt.Sprintf("Unmarshaler error. City %s: %v", city.Name, rErr))
 	}
 

@@ -13,62 +13,62 @@ type DbBase struct {
 }
 
 type Weather struct {
-	DbBase
-	CityId        int
-	Name          string
-	Coord         Coordinates `gorm:"embedded;embeddedPrefix:coord_"`
-	Conditions    []Condition `gorm:"many2many:weather_conditions;constraint:OnDelete:CASCADE;"`
-	MainId        uuid.UUID   `gorm:"type:uuid;"`
-	Main          MainInfo
-	Visibility    int
-	Clouds        Clouds `gorm:"embedded;embeddedPrefix:clouds_"`
-	Rain          Rain   `gorm:"embedded;embeddedPrefix:rain_"`
-	Snow          Snow   `gorm:"embedded;embeddedPrefix:snow_"`
-	DateUtcMillis int64
-	Timezone      int
-	SysId         uuid.UUID `gorm:"type:uuid;"`
-	Sys           System
+	DbBase        `json:"-"`
+	CityId        int         `json:"cityId"`
+	Name          string      `json:"name"`
+	Coord         Coordinates `gorm:"embedded;embeddedPrefix:coord_" json:"coord"`
+	Conditions    []Condition `gorm:"many2many:weather_conditions;constraint:OnDelete:CASCADE;" json:"conditions"`
+	MainId        uuid.UUID   `gorm:"type:uuid;" json:"-"`
+	Main          MainInfo    `json:"main"`
+	Visibility    int         `json:"visibility"`
+	Clouds        Clouds      `gorm:"embedded;embeddedPrefix:clouds_" json:"clouds"`
+	Rain          Rain        `gorm:"embedded;embeddedPrefix:rain_" json:"rain"`
+	Snow          Snow        `gorm:"embedded;embeddedPrefix:snow_" json:"snow"`
+	DateUtcMillis int64       `json:"dtUnix"`
+	Timezone      int         `json:"timezone"`
+	SysId         uuid.UUID   `gorm:"type:uuid;" json:"-"`
+	Sys           System      `json:"sys"`
 }
 
 type Coordinates struct {
-	Longitude float64
-	Latitude  float64
+	Longitude float64 `json:"lat"`
+	Latitude  float64 `json:"lon"`
 }
 
 type Condition struct {
-	Id          int
-	Main        string
-	Description string
-	Icon        string
+	Id          int    `json:"id"`
+	Main        string `json:"main"`
+	Description string `json:"description"`
+	Icon        string `json:"icon"`
 }
 
 type MainInfo struct {
-	DbBase
-	Temp      float64
-	FeelsLike float64
-	Pressure  float64
-	Humidity  float64
-	TempMin   float64
-	TempMax   float64
+	DbBase    `json:"-"`
+	Temp      float64 `json:"temp"`
+	FeelsLike float64 `json:"feelsLike"`
+	Pressure  float64 `json:"pressure"`
+	Humidity  float64 `json:"humidity"`
+	TempMin   float64 `json:"tempMin"`
+	TempMax   float64 `json:"tempMax"`
 }
 
 type Clouds struct {
-	All int
+	All int `json:"all"`
 }
 
 type Rain struct {
-	OneHour float64
+	OneHour float64 `json:"1h"`
 }
 
 type Snow struct {
-	OneHour float64
+	OneHour float64 `json:"1h"`
 }
 
 type System struct {
-	DbBase
-	Country          string
-	SunriseUtcMillis float64
-	SunsetUtcMillis  float64
+	DbBase           `json:"-"`
+	Country          string  `json:"country"`
+	SunriseUtcMillis float64 `json:"sunriseDtUnix"`
+	SunsetUtcMillis  float64 `json:"sunsetDtUnix"`
 }
 
 type CityForecast struct {

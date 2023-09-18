@@ -1,4 +1,4 @@
-package models
+package open_weather
 
 type WeatherResponse struct {
 	Id            int                `json:"id"`
