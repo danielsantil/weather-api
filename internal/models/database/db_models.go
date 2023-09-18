@@ -16,16 +16,17 @@ type Weather struct {
 	DbBase
 	CityId        int
 	Name          string
-	Coord         Coordinates        `gorm:"embedded;embeddedPrefix:coord_'"`
-	Weather       []WeatherCondition `gorm:"many2many:weather_weather_conditions"`
-	MainId        uuid.UUID          `gorm:"type:uuid;constraint:OnDelete:CASCADE;"`
+	Coord         Coordinates `gorm:"embedded;embeddedPrefix:coord_"`
+	Conditions    []Condition `gorm:"many2many:weather_conditions;constraint:OnDelete:CASCADE;"`
+	MainId        uuid.UUID   `gorm:"type:uuid;"`
 	Main          MainInfo
 	Visibility    int
-	Clouds        Clouds `gorm:"embedded;embeddedPrefix:clouds_'"`
-	Rain          Rain   `gorm:"embedded;embeddedPrefix:rain_'"`
-	Snow          Snow   `gorm:"embedded;embeddedPrefix:snow_'"`
+	Clouds        Clouds `gorm:"embedded;embeddedPrefix:clouds_"`
+	Rain          Rain   `gorm:"embedded;embeddedPrefix:rain_"`
+	Snow          Snow   `gorm:"embedded;embeddedPrefix:snow_"`
 	DateUtcMillis int64
 	Timezone      int
+	SysId         uuid.UUID `gorm:"type:uuid;"`
 	Sys           System
 }
 
@@ -34,8 +35,7 @@ type Coordinates struct {
 	Latitude  float64
 }
 
-type WeatherCondition struct {
-	DbBase
+type Condition struct {
 	Id          int
 	Main        string
 	Description string
@@ -69,7 +69,6 @@ type System struct {
 	Country          string
 	SunriseUtcMillis float64
 	SunsetUtcMillis  float64
-	WeatherId        uuid.UUID `gorm:"type:uuid;constraint:OnDelete:CASCADE;"`
 }
 
 type CityForecast struct {
@@ -81,8 +80,21 @@ type CityForecast struct {
 type Forecast struct {
 	DbBase
 	DateUtcMillis  int64
-	MainId         uuid.UUID `gorm:"type:uuid;constraint:OnDelete:CASCADE;"`
+	MainId         uuid.UUID `gorm:"type:uuid;"`
 	Main           MainInfo
-	Weather        []WeatherCondition `gorm:"many2many:weather_weather_conditions"`
-	CityForecastID uuid.UUID          `gorm:"type:uuid;constraint:OnDelete:CASCADE;"`
+	Weather        []Condition `gorm:"many2many:forecast_conditions;constraint:OnDelete:CASCADE;"`
+	CityForecastID uuid.UUID   `gorm:"type:uuid;constraint:OnDelete:CASCADE;"`
+}
+
+type City struct {
+	DbBase
+	CityId          int
+	Name            string
+	Country         string
+	LastTimeFetched *time.Time
+}
+
+type Seeding struct {
+	Name      string `gorm:"primaryKey"`
+	CreatedAt time.Time
 }

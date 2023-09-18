@@ -1,4 +1,4 @@
-package utils
+package config
 
 import (
 	"fmt"
@@ -7,10 +7,11 @@ import (
 	"log"
 )
 
-func AddRouter(port int) *gin.Engine {
+func AddRouter(port int, injector handlers.Injector) *gin.Engine {
 	router := gin.Default()
 	router.GET("health", handlers.HandlerHealth)
-	router.GET("weather", handlers.HandlerGetWeather)
+	router.GET("weather/:cityId", injector.HandlerGetLastWeather)
+	router.GET("weather-history/:cityId", injector.HandlerGetWeatherHistory)
 
 	serverErr := router.Run(fmt.Sprintf("localhost:%d", port))
 	if serverErr != nil {

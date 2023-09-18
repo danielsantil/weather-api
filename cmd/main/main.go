@@ -1,12 +1,15 @@
 package main
 
 import (
-	"github.com/danielsantil/weather-api/internal/utils"
+	"github.com/danielsantil/weather-api/internal/config"
+	"github.com/danielsantil/weather-api/internal/handlers"
 )
 
 func main() {
 	connString := "host=localhost user=postgres password=admin dbname=weather port=5432 sslmode=disable"
-	utils.AddDatabase(connString)
+	db := config.AddDatabase(connString)
+	injector := handlers.Injector{DB: db}
+	go config.AddBackgroundJobs(db)
 	port := 8000
-	utils.AddRouter(port)
+	config.AddRouter(port, injector)
 }

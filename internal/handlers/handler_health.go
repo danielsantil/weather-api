@@ -6,5 +6,5 @@ import (
 )
 
 func HandlerHealth(c *gin.Context) {
-	c.JSON(http.StatusOK, struct{}{})
+	c.String(http.StatusOK, "ok")
 }
