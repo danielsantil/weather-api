@@ -10,7 +10,8 @@ import (
 func AddRouter(port int, injector handlers.Injector) *gin.Engine {
 	router := gin.Default()
 	router.GET("health", handlers.HandlerHealth)
-	router.GET("weather/:cityId", injector.HandlerGetLastWeather)
+	router.GET("weather/:id", injector.HandlerGetWeather)
+	router.GET("weather-last/:cityId", injector.HandlerGetLastWeather)
 	router.GET("weather-history/:cityId", injector.HandlerGetWeatherHistory)
 
 	serverErr := router.Run(fmt.Sprintf("localhost:%d", port))

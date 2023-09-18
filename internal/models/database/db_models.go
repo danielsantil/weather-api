@@ -7,13 +7,13 @@ import (
 )
 
 type DbBase struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 type Weather struct {
-	DbBase        `json:"-"`
+	DbBase
 	CityId        int         `json:"cityId"`
 	Name          string      `json:"name"`
 	Coord         Coordinates `gorm:"embedded;embeddedPrefix:coord_" json:"coord"`
