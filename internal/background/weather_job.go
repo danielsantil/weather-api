@@ -15,7 +15,7 @@ import (
 )
 
 func StartWeathersJob(db *gorm.DB, sleepDuration time.Duration, workersCount int) {
-	log.Printf("Starting job to retrieve Open Weather data."+
+	log.Printf("Starting job to retrieve Open Weather data for WEATHERS."+
 		"Using %d workers\n every %v", workersCount, sleepDuration)
 
 	ticker := time.NewTicker(sleepDuration)
@@ -49,6 +49,17 @@ func updateWeather(db *gorm.DB, cities []database.City, wg *sync.WaitGroup) {
 		}
 
 		dbWeather := mapToDbWeather(response)
+
+		// TODO fetch weather where city_id and date_utc equals dbWeather, if exists, skip insert
+		var existingWeather database.Weather
+		exists := db.Where("city_id = ? AND date_utc_millis = ?", dbWeather.CityId, dbWeather.DateUtcMillis).
+			First(&existingWeather)
+
+		if exists.RowsAffected > 0 {
+			log.Printf("Skipping insert for city %s and dt %v\n", city.Name, dbWeather.DateUtcMillis)
+			continue
+		}
+
 		result := db.Create(&dbWeather)
 		if result.Error != nil {
 			log.Printf("Error inserting weather data for city %s\n", city.Name)

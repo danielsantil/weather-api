@@ -88,10 +88,10 @@ type Forecast struct {
 
 type City struct {
 	DbBase
-	CityId          int
-	Name            string
-	Country         string
-	LastTimeFetched *time.Time
+	CityId          int        `json:"cityId"`
+	Name            string     `json:"name"`
+	Country         string     `json:"country"`
+	LastTimeFetched *time.Time `json:"-"`
 }
 
 type Seeding struct {
