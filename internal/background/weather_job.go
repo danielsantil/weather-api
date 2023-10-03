@@ -15,7 +15,7 @@ import (
 )
 
 func StartWeathersJob(db *gorm.DB, sleepDuration time.Duration, workersCount int) {
-	log.Printf("Starting job to retrieve Open Weather data for WEATHERS."+
+	log.Printf("Starting job to retrieve Open Weather data for WEATHERS. "+
 		"Using %d workers\n every %v", workersCount, sleepDuration)
 
 	ticker := time.NewTicker(sleepDuration)
@@ -50,13 +50,13 @@ func updateWeather(db *gorm.DB, cities []database.City, wg *sync.WaitGroup) {
 
 		dbWeather := mapToDbWeather(response)
 
-		// TODO fetch weather where city_id and date_utc equals dbWeather, if exists, skip insert
+		// fetch weather where city_id and date_utc equals dbWeather, if exists, skip insert
 		var existingWeather database.Weather
 		exists := db.Where("city_id = ? AND date_utc_millis = ?", dbWeather.CityId, dbWeather.DateUtcMillis).
 			First(&existingWeather)
 
 		if exists.RowsAffected > 0 {
-			log.Printf("Skipping insert for city %s and dt %v\n", city.Name, dbWeather.DateUtcMillis)
+			log.Printf("Skipping weather insert for city %s and dt %v\n", city.Name, dbWeather.DateUtcMillis)
 			continue
 		}
 
@@ -72,19 +72,6 @@ func updateWeather(db *gorm.DB, cities []database.City, wg *sync.WaitGroup) {
 }
 
 func mapToDbWeather(w open_weather.WeatherResponse) database.Weather {
-	mapConditions := func(conditionsArray []open_weather.WeatherCondition) []database.Condition {
-		conditionsRes := make([]database.Condition, len(conditionsArray))
-		for i, cond := range conditionsArray {
-			conditionsRes[i] = database.Condition{
-				Id:          cond.Id,
-				Main:        cond.Main,
-				Description: cond.Description,
-				Icon:        cond.Icon,
-			}
-		}
-		return conditionsRes
-	}
-
 	return database.Weather{
 		CityId: w.Id,
 		Name:   w.Name,
@@ -115,6 +102,19 @@ func mapToDbWeather(w open_weather.WeatherResponse) database.Weather {
 	}
 }
 
+func mapConditions(conditionsArray []open_weather.WeatherCondition) []database.Condition {
+	conditionsRes := make([]database.Condition, len(conditionsArray))
+	for i, cond := range conditionsArray {
+		conditionsRes[i] = database.Condition{
+			Id:          cond.Id,
+			Main:        cond.Main,
+			Description: cond.Description,
+			Icon:        cond.Icon,
+		}
+	}
+	return conditionsRes
+}
+
 func getCitiesForWorkers(cities []database.City, workerCount int) [][]database.City {
 	citiesTotal := len(cities)
 	newLength := citiesTotal / workerCount
@@ -136,11 +136,12 @@ func getCitiesForWorkers(cities []database.City, workerCount int) [][]database.C
 func fetchWeatherData(city database.City) (open_weather.WeatherResponse, error) {
 	log.Printf("Fetching weather data for city: %d - %s\n", city.CityId, city.Name)
 	httpClient := http.Client{}
+	// TODO add baseUrl, api key to env
 	baseUrl := "https://api.openweathermap.org/data/2.5"
 	res, hErr := httpClient.Get(fmt.Sprintf("%s/weather?id=%d&appid=%s", baseUrl, city.CityId, "e9d23eedd545de00620c0c542ffb66e1"))
 	if hErr != nil {
 		return open_weather.WeatherResponse{},
-			errors.New(fmt.Sprintf("Http error. City %s: %v", city.Name, hErr))
+			errors.New(fmt.Sprintf("Http error for weather. City %s: %v", city.Name, hErr))
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()

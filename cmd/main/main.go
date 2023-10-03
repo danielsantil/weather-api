@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	// TODO add connection string to env
 	connString := "host=localhost user=postgres password=admin dbname=weather port=5432 sslmode=disable"
 	db := config.AddDatabase(connString)
 	injector := handlers.Injector{DB: db}

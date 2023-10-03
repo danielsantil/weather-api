@@ -7,5 +7,7 @@ import (
 )
 
 func AddBackgroundJobs(db *gorm.DB) {
-	background.StartWeathersJob(db, time.Minute*5, 5)
+	// TODO add duration and workers count to env
+	background.StartWeathersJob(db, time.Minute*15, 5)
+	background.StartForecastJob(db, time.Minute*180, 5)
 }
