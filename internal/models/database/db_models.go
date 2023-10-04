@@ -72,19 +72,19 @@ type System struct {
 }
 
 type CityForecast struct {
-	CityId    int       `gorm:"primaryKey"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	Forecasts []Forecast
+	CityId    int        `gorm:"primaryKey" json:"cityId"`
+	CreatedAt time.Time  `json:"-"`
+	UpdatedAt time.Time  `json:"-"`
+	Forecasts []Forecast `json:"forecasts"`
 }
 
 type Forecast struct {
 	DbBase
-	DateUtcMillis  int64
-	MainId         uuid.UUID `gorm:"type:uuid;"`
-	Main           MainInfo
-	Weather        []Condition `gorm:"many2many:forecast_conditions;constraint:OnDelete:CASCADE;"`
-	CityForecastID int         `gorm:"type:uuid;constraint:OnDelete:CASCADE;"`
+	DateUtcMillis  int64       `json:"dtUnix"`
+	MainId         uuid.UUID   `gorm:"type:uuid;" json:"-"`
+	Main           MainInfo    `json:"main"`
+	Weather        []Condition `gorm:"many2many:forecast_conditions;constraint:OnDelete:CASCADE;" json:"weather"`
+	CityForecastID int         `gorm:"type:uuid;constraint:OnDelete:CASCADE;" json:"-"`
 }
 
 type City struct {

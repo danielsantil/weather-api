@@ -17,6 +17,8 @@ func AddRouter(port int, injector handlers.Injector) *gin.Engine {
 
 	router.GET("cities", injector.HandlerGetCities)
 
+	router.GET("forecast/:cityId", injector.HandlerGetForecast)
+
 	serverErr := router.Run(fmt.Sprintf("localhost:%d", port))
 	if serverErr != nil {
 		log.Fatal(serverErr)
