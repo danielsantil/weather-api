@@ -6,11 +6,9 @@ import (
 )
 
 func main() {
-	// TODO add connection string to env
-	connString := "host=localhost user=postgres password=admin dbname=weather port=5432 sslmode=disable"
-	db := config.AddDatabase(connString)
+	env := config.LoadEnv()
+	db := config.AddDatabase(env.ConnectionString)
 	injector := handlers.Injector{DB: db}
-	go config.AddBackgroundJobs(db)
-	port := 8000
-	config.AddRouter(port, injector)
+	go config.AddBackgroundJobs(db, env)
+	config.AddRouter(env.Port, injector)
 }

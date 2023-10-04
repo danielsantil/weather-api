@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/danielsantil/weather-api/internal/models"
 	"github.com/danielsantil/weather-api/internal/models/database"
 	"github.com/danielsantil/weather-api/internal/models/open_weather"
 	"gorm.io/gorm"
@@ -14,9 +15,10 @@ import (
 	"time"
 )
 
-func StartForecastJob(db *gorm.DB, sleepDuration time.Duration, workersCount int) {
+func StartForecastJob(db *gorm.DB, env models.Env) {
+	sleepDuration := time.Minute * time.Duration(env.ForecastJobSleepDurationInMin)
 	log.Printf("Starting job to retrieve Open Weather data for FORECASTS. "+
-		"Using %d workers\n every %v", workersCount, sleepDuration)
+		"Using %d workers\n every %v", env.ForecastJobWorkers, sleepDuration)
 
 	now := time.Now()
 	ticker := time.NewTicker(sleepDuration)
@@ -28,11 +30,11 @@ func StartForecastJob(db *gorm.DB, sleepDuration time.Duration, workersCount int
 			continue
 		}
 
-		listOfCities := getCitiesForWorkers(citiesList, workersCount)
+		listOfCities := getCitiesForWorkers(citiesList, env.ForecastJobWorkers)
 		wg := &sync.WaitGroup{}
 		for _, cities := range listOfCities {
 			wg.Add(1)
-			go updateForecast(db, cities, wg, now, sleepDuration)
+			go updateForecast(db, cities, wg, now, sleepDuration, env)
 		}
 		wg.Wait()
 		log.Println("=====================")
@@ -40,11 +42,11 @@ func StartForecastJob(db *gorm.DB, sleepDuration time.Duration, workersCount int
 }
 
 func updateForecast(db *gorm.DB, cities []database.City, wg *sync.WaitGroup,
-	now time.Time, sleepDuration time.Duration) {
+	now time.Time, sleepDuration time.Duration, env models.Env) {
 	defer wg.Done()
 
 	for _, city := range cities {
-		response, err := fetchForecastData(city)
+		response, err := fetchForecastData(city, env.OpenWeatherUrl, env.OpenWeatherApiKey)
 		if err != nil {
 			log.Println(err)
 			continue
@@ -74,12 +76,10 @@ func updateForecast(db *gorm.DB, cities []database.City, wg *sync.WaitGroup,
 	}
 }
 
-func fetchForecastData(city database.City) (open_weather.ForecastResponse, error) {
+func fetchForecastData(city database.City, baseUrl string, apiKey string) (open_weather.ForecastResponse, error) {
 	log.Printf("Fetching forecast data for city: %d - %s\n", city.CityId, city.Name)
 	httpClient := http.Client{}
-	// TODO add baseUrl, api key to env
-	baseUrl := "https://api.openweathermap.org/data/2.5"
-	res, hErr := httpClient.Get(fmt.Sprintf("%s/forecast?id=%d&appid=%s", baseUrl, city.CityId, "e9d23eedd545de00620c0c542ffb66e1"))
+	res, hErr := httpClient.Get(fmt.Sprintf("%s/forecast?id=%d&appid=%s", baseUrl, city.CityId, apiKey))
 	if hErr != nil {
 		return open_weather.ForecastResponse{},
 			errors.New(fmt.Sprintf("Http error for forecast. City %s: %v", city.Name, hErr))
