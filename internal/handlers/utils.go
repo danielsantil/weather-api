@@ -8,6 +8,9 @@ import (
 	"net/http"
 )
 
+// returnError returns error response with a 4xx http status code.
+//
+// If record not found, returns 404, otherwise it returns 400 bad request
 func returnError(c *gin.Context, err error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		utils.RespondWithError(c, http.StatusNotFound, err.Error())

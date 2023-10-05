@@ -16,6 +16,7 @@ type WeatherSummary struct {
 	FeelsLike   float64   `json:"feelsLike"`
 }
 
+// MapToWeatherSummary maps database weather model to a weather summary DTO
 func MapToWeatherSummary(weather database.Weather) WeatherSummary {
 	return WeatherSummary{
 		Id:          weather.ID,

@@ -7,6 +7,9 @@ import (
 	"log"
 )
 
+// AddRouter initializes router and adds handlers.
+//
+// Starts server on localhost, using the port number previously loaded from the .env file
 func AddRouter(port int, injector handlers.Injector) *gin.Engine {
 	router := gin.Default()
 	router.GET("health", handlers.HandlerHealth)

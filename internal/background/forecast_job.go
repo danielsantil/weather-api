@@ -15,6 +15,7 @@ import (
 	"time"
 )
 
+// StartForecastJob starts job to retrieve forecast data
 func StartForecastJob(db *gorm.DB, env models.Env) {
 	sleepDuration := time.Minute * time.Duration(env.ForecastJobSleepDurationInMin)
 	log.Printf("Starting job to retrieve Open Weather data for FORECASTS. "+

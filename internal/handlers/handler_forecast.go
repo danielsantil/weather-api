@@ -6,6 +6,9 @@ import (
 	"net/http"
 )
 
+// HandlerGetForecast returns forecast data for a city id
+//
+// If an error occurs while retrieving from the database, a 4xx status code is returned
 func (inj *Injector) HandlerGetForecast(c *gin.Context) {
 	cityId := c.Param("cityId")
 	var forecast []database.CityForecast

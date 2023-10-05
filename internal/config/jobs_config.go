@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// AddBackgroundJobs starts background jobs
 func AddBackgroundJobs(db *gorm.DB, env models.Env) {
 	go background.StartForecastJob(db, env)
 	go background.StartWeathersJob(db, env)

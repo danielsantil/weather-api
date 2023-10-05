@@ -18,6 +18,9 @@ type GetWeatherHistoryRequest struct {
 	Limit  int    `uri:"limit" binding:"required"`
 }
 
+// HandlerGetWeather returns weather data for a specific weather id.
+//
+// If an error occurs while retrieving from the database, a 4xx status code is returned
 func (inj *Injector) HandlerGetWeather(c *gin.Context) {
 	var req GetWeatherRequest
 	if err := c.ShouldBindUri(&req); err != nil {
@@ -37,6 +40,9 @@ func (inj *Injector) HandlerGetWeather(c *gin.Context) {
 	c.JSON(http.StatusOK, weather)
 }
 
+// HandlerGetWeatherHistory returns weather history data for a city id, ordered by date.
+//
+// If an error occurs while retrieving from the database, a 4xx status code is returned
 func (inj *Injector) HandlerGetWeatherHistory(c *gin.Context) {
 	var req GetWeatherHistoryRequest
 	if err := c.ShouldBindUri(&req); err != nil {
@@ -54,6 +60,9 @@ func (inj *Injector) HandlerGetWeatherHistory(c *gin.Context) {
 	c.JSON(http.StatusOK, weatherData)
 }
 
+// HandlerGetLastWeather returns last weather data for a city id.
+//
+// If an error occurs while retrieving from the database, a 4xx status code is returned
 func (inj *Injector) HandlerGetLastWeather(c *gin.Context) {
 	cityId := c.Param("cityId")
 	var lastWeather database.Weather

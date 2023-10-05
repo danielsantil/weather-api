@@ -8,6 +8,9 @@ import (
 	"strconv"
 )
 
+// LoadEnv loads environment variables from .env file.
+//
+// .env file must be present in root directory.
 func LoadEnv() models.Env {
 	_ = godotenv.Load()
 	port, err := strconv.Atoi(os.Getenv("PORT"))

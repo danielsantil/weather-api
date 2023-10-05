@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+// AddDatabase connects to postgres database specified in connection string,
+// applies migrations and seeds the database.
 func AddDatabase(connString string) *gorm.DB {
 	db, dbErr := gorm.Open(postgres.Open(connString), &gorm.Config{})
 	if dbErr != nil {
@@ -30,6 +32,9 @@ func AddDatabase(connString string) *gorm.DB {
 	return db
 }
 
+// seedData Seeds database
+//
+// See sql/seeds directory for seeding files
 func seedData(db *gorm.DB) {
 	log.Println("Started seeding SQL files...")
 	path := "internal/sql/seeds"
@@ -44,7 +49,7 @@ func seedData(db *gorm.DB) {
 	var count int
 
 	for _, file := range entries {
-		if SeedingExists(seeding, file.Name()) {
+		if seedingExists(seeding, file.Name()) {
 			continue
 		}
 
@@ -65,7 +70,7 @@ func seedData(db *gorm.DB) {
 	log.Printf("Seeding complete. Total files: %d\n", count)
 }
 
-func SeedingExists(seeding []database.Seeding, seedName string) bool {
+func seedingExists(seeding []database.Seeding, seedName string) bool {
 	for _, seed := range seeding {
 		if seed.Name == seedName {
 			return true

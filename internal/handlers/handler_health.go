@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// HandlerHealth returns ok. Useful to do a fast check on the API status
 func HandlerHealth(c *gin.Context) {
 	c.String(http.StatusOK, "ok")
 }
