@@ -25,3 +25,9 @@ Make sure to include a **.env** file in the root directory, containing the follo
 | GET /weather-history/:cityId/:limit | Gets weather history for city id, ordered by date.<br/>Limit specifies total of records to be returned |
 | GET /cities                         | Gets list of cities, ordered by name                                                                   |
 | GET /forecast/:cityId               | Gets forecast data for city id                                                                         |
+
+## NOTE:
+This API uses Postgres as the database, and it depends on extension `uuid-ossp` to generate UUIDs for primary keys.
+
+Execute `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` in the SQL console before running the API, otherwise, you might get this error on startup:
+`Function uuid_generate_v4() does not exist`
